@@ -4,32 +4,50 @@ import "./App.css";
 const App = () => {
   const [text, setText] = useState("");
   const [timeRemaining, setTimeRemaining] = useState(10);
+  const [startGame, setStartGame] = useState(false);
+  const [wordCount, setWordCount] = useState(0);
 
   const handleChange = e => {
     const { value } = e.target;
     setText(value);
   };
 
-  const wordCount = text => {
+  const calculateWordCount = text => {
     const wordsArr = text.trim().split(" ");
     return wordsArr.filter(word => word !== "").length;
   };
 
+  const beginGame = () => {
+    setStartGame(!startGame);
+    setTimeRemaining(10);
+  };
+
+  const buttonLogic = () => {
+    if (timeRemaining === 10) {
+      return <button onClick={beginGame}>Start Game</button>;
+    } else {
+      return <button onClick={beginGame}>Reset</button>;
+    }
+  };
+
   useEffect(() => {
-    if (timeRemaining > 0) {
-      setTimeout(function() {
+    if (timeRemaining > 0 && startGame === true) {
+      setTimeout(() => {
         setTimeRemaining(time => time - 1);
       }, 1000);
+    } else if (timeRemaining === 0) {
+      setStartGame(false);
+      setWordCount(calculateWordCount(text));
     }
-  }, [timeRemaining]);
+  }, [timeRemaining, startGame]);
 
   return (
     <div>
       <h1>Test Your Speed</h1>
       <textarea onChange={handleChange} value={text} />
       <h4>Time Remaining:{timeRemaining}</h4>
-      <button>Start Game</button>
-      <h1>Word Count:</h1>
+      {buttonLogic}
+      <h1>Word Count:{wordCount}</h1>
     </div>
   );
 };
