@@ -2,52 +2,57 @@ import React, { useState, useEffect } from "react";
 import "./App.css";
 
 const App = () => {
+  const START_TIME = 5;
+
   const [text, setText] = useState("");
-  const [timeRemaining, setTimeRemaining] = useState(10);
-  const [startGame, setStartGame] = useState(false);
+  const [timeRemaining, setTimeRemaining] = useState(START_TIME);
+  const [isTimeRunning, setIsTimeRunning] = useState(false);
   const [wordCount, setWordCount] = useState(0);
 
-  const handleChange = e => {
+  function handleChange(e) {
     const { value } = e.target;
     setText(value);
-  };
+  }
 
-  const calculateWordCount = text => {
+  function calculateWordCount(text) {
     const wordsArr = text.trim().split(" ");
     return wordsArr.filter(word => word !== "").length;
-  };
+  }
 
-  const beginGame = () => {
-    setStartGame(!startGame);
-    setTimeRemaining(10);
-  };
+  function startGame() {
+    setIsTimeRunning(true);
+    setTimeRemaining(START_TIME);
+    setText("");
+  }
 
-  const buttonLogic = () => {
-    if (timeRemaining === 10) {
-      return <button onClick={beginGame}>Start Game</button>;
-    } else {
-      return <button onClick={beginGame}>Reset</button>;
-    }
-  };
+  function endGame() {
+    setIsTimeRunning(false);
+    setWordCount(calculateWordCount(text));
+  }
 
   useEffect(() => {
-    if (timeRemaining > 0 && startGame === true) {
+    if (isTimeRunning && timeRemaining > 0) {
       setTimeout(() => {
         setTimeRemaining(time => time - 1);
       }, 1000);
     } else if (timeRemaining === 0) {
-      setStartGame(false);
-      setWordCount(calculateWordCount(text));
+      endGame();
     }
-  }, [timeRemaining, startGame]);
+  }, [timeRemaining, isTimeRunning]);
 
   return (
     <div>
-      <h1>Test Your Speed</h1>
-      <textarea onChange={handleChange} value={text} />
-      <h4>Time Remaining:{timeRemaining}</h4>
-      {buttonLogic}
-      <h1>Word Count:{wordCount}</h1>
+      <h1>How fast do you type?</h1>
+      <textarea
+        onChange={handleChange}
+        value={text}
+        disabled={!isTimeRunning}
+      />
+      <h4>Time remaining: {timeRemaining}</h4>
+      <button onClick={startGame} disabled={isTimeRunning}>
+        Start
+      </button>
+      <h1>Word count: {wordCount}</h1>
     </div>
   );
 };
